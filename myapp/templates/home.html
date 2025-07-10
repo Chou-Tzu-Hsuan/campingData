@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}<title>派森露營商城首頁</title>{% endblock %}
+
+
+{% block content %}
+<!-- 輪播圖片設定區 -->
+<div class="carousel-container">
+    <div><img src="{% static 'myapp/images/campingLife7.jpg' %}" alt="camping1"></div>
+    <div><img src="{% static 'myapp/images/campingLife2.jpg' %}" alt="camping2"></div>
+    <div><img src="{% static 'myapp/images/campingLife3.jpg' %}" alt="camping3"></div>
+    <div><img src="{% static 'myapp/images/campingLife4.jpg' %}" alt="camping4"></div>
+    <div><img src="{% static 'myapp/images/campingLife5.jpg' %}" alt="camping5"></div>
+    <div><img src="{% static 'myapp/images/campingLife6.jpg' %}" alt="camping6"></div>
+    <div><img src="{% static 'myapp/images/campingLife8.jpg' %}" alt="camping8"></div>
+    <div><img src="{% static 'myapp/images/campingLife9.jpg' %}" alt="camping9"></div>
+</div>
+
+<div class="header">
+    <h1>歡迎來到派森Python露營</h1>
+    <p>探索最適合你的露營裝備</p>
+</div>
+
+<div class="container mt-4">
+    <!-- 電腦版 Tabs（只在 md 以上顯示） -->
+    <ul class="nav nav-tabs d-none d-md-flex" id="myTab">
+        {% for name, cat_id in categories %}
+        <li class="nav-item">
+            <a class="nav-link {% if forloop.first %}active{% endif %}" data-bs-toggle="tab" href="#tab{{ cat_id }}">
+                {{ name }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- 手機版 Dropdown（只在 md 以下顯示） -->
+    <div class="d-block d-md-none mb-3">
+        <select class="form-select" id="categorySelect" onchange="switchTab(this)">
+            {% for name, cat_id in categories %}
+            <option value="tab{{ cat_id }}">{{ name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Tab 分類內容 -->
+    <div class="tab-content mt-3" id="myTabContent">
+        {% for name, cat_id in categories %}
+        <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="tab{{ cat_id }}">
+            <h4 class="mb-3">{{ name }}</h4>
+            <div class="product-grid">
+                {% with category_products|get_item:cat_id as products %}
+                    {% for product in products %}
+                    <div class="product-card">
+
+                        {% with product.images.first as main_image %}
+                            {% if main_image %}
+                                <img src="{{ main_image.image.url }}" alt="{{ main_image.alt_text }}">
+                            {% elif product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.product_name }}">
+                            {% else %}
+                                <div class="no-image">無圖片</div>
+                            {% endif %}
+                        {% endwith %}
+
+
+                        <h3>{{ product.product_name }}</h3>
+                        <p class="price">{{ product.price }} 元</p>
+                        <div class="btn-group">
+                            <a href="{% url 'product_detail' product.pk %}" class="btn btn-sm btn-outline-primary">查看詳情</a>
+                            <form method="post" action="{% url 'add_to_cart' product.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-success">加入購物車</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>此分類暫無商品。</p>
+                    {% endfor %}
+                {% endwith %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<br>
+{% endblock %}
+
+

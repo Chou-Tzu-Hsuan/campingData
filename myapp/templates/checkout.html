@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+<title>結帳 - 派森Python露營商城</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .form-section {
+        background: #fff;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    .section-title {
+        border-left: 5px solid #0d6efd;
+        padding-left: 10px;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+    @media (max-width: 576px) {
+        .section-title {
+            font-size: 1.1rem;
+            padding-left: 6px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4 text-center">🧾 訂單內容</h2>
+
+    <!-- 購物清單 -->
+    <div class="form-section mb-5">
+        <div class="section-title">🛍️ 購物清單</div>
+        <table class="table table-striped align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>商品名稱</th>
+                    <th>單價</th>
+                    <th>數量</th>
+                    <th>小計</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product_id, item in cart_items.items %}
+                <tr>
+                    <td>{{ item.product_name }}</td>
+                    <td>${{ item.price }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>${{ item.subtotal }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p class="fs-5 text-end"><strong>總金額：${{ total }}</strong></p>
+    </div>
+
+    <!-- 結帳表單 -->
+    <div class="form-section">
+        <form method="post" action="{% url 'submit_order' %}">
+            {% csrf_token %}
+            <div class="section-title">📦 寄送資訊</div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="recipient_name" class="form-label">收件人姓名 <span class="text-danger">*</span></label>
+                    <input type="text" id="recipient_name" name="recipient_name" class="form-control"
+                           placeholder="例：王小明" required autocomplete="name" value="{{ user.username|default:'' }}" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="phone" class="form-label">聯絡電話 <span class="text-danger">*</span></label>
+                    <input type="tel" id="phone" name="contact_phone" class="form-control"
+                           placeholder="例：0912345678" required maxlength="10"
+                           pattern="^09[0-9]{8}$"
+                           title="請輸入正確的台灣手機號碼格式，例如：0912345678"
+                           autocomplete="tel" value="{{ user.phone|default:'' }}" //>
+                </div>
+
+                <div class="col-12">
+                    <label for="address" class="form-label">街道地址 <span class="text-danger">*</span></label>
+                    <input type="text" id="address" name="shipping_address" class="form-control"
+                           placeholder="例：信義區松壽路 20 號" required autocomplete="street-address" value="{{ user.address|default:'' }}" //>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="zip" class="form-label">郵遞區號（根據地址自動判斷）</label>
+                    <input type="text" id="zip" name="shipping_zip_code" class="form-control"
+                        placeholder="例：110" maxlength="5" autocomplete="postal-code" />
+                </div>
+            </div>
+
+            <!-- 付款方式 -->
+            <div class="section-title mt-4">💳 付款方式</div>
+            <div class="row align-items-center mb-4">
+                <div class="col-sm-9">
+                    <select id="payment_method" name="payment_method" class="form-select" required>
+                        <option value="">請選擇</option>
+                        <option value="信用卡">信用卡</option>
+                        <option value="貨到付款">貨到付款</option>
+                        <option value="LINE Pay">LINE Pay</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- ✅ 提交按鈕區 -->
+            <div class="text-end mt-4">
+                <button type="submit" class="btn btn-success me-2">✅ 提交訂單</button>
+                <a href="{% url 'view_cart' %}" class="btn btn-secondary">返回購物車</a>
+            </div>
+
+            {% if not user.is_authenticated %}
+            <div class="alert alert-warning text-center mt-4">
+                請先<a href="{% url 'userlogin' %}?next={{ request.path }}">登入</a> 或 <a href="{% url 'register' %}">註冊</a> 才能結帳
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // ✅ 修正「登入後返回 checkout 頁面」的舊 CSRF token 問題
+    if (window.performance && performance.navigation.type === 2) {
+        console.warn("⚠️ 使用者按下上一頁，自動重新整理以重載 CSRF token");
+        location.reload();
+    }
+
+    // ✅ 地址自動辨識郵遞區號
+    const addressInput = document.getElementById('address');
+    const zipInput = document.getElementById('zip');
+
+    const zipMap = {
+        '信義區': '110', '大安區': '106', '中山區': '104', '中正區': '100',
+        '松山區': '105', '內湖區': '114', '南港區': '115', '萬華區': '108',
+        '板橋區': '220', '新莊區': '242', '桃園區': '330', '中壢區': '320',
+        '竹北市': '302', '台中市': '400', '台南市': '700', '高雄市': '800',
+        '雙溪區': '227', '竹東鎮': '310', '七堵區': '206', '新店區': '231',
+        // 可擴充更多
+    };
+
+    function detectZipFromAddress() {
+        const address = addressInput.value;
+        for (const area in zipMap) {
+            if (address.includes(area)) {
+                zipInput.value = zipMap[area];
+                break;
+            }
+        }
+    }
+
+    detectZipFromAddress();
+    addressInput.addEventListener('input', detectZipFromAddress);
+});
+</script>
+{% endblock  %}
+

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}
+  我的訂單 - CampingData
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <h2 class="mb-4 text-left">
+    <i class="bi bi-bag-check-fill me-2"></i>我的訂單
+  </h2>
+
+  {% if orders %}
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover align-middle text-center">
+        <thead class="table-primary">
+          <tr>
+            <th>訂單編號</th>
+            <th>訂單日期</th>
+            <th>總金額</th>
+            <th>訂單狀態</th>
+            <th>付款狀態</th>
+            <th>運送地址</th>
+            <th>郵遞區號</th>
+            <th>付款方式</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+            <tr>
+              <td>{{ order.order_id }}</td>
+              <td>{{ order.order_date|date:"Y-m-d H:i" }}</td>
+              <td>NT${{ order.total_amount }}</td>
+              <td>{{ order.order_status }}</td>
+              <td>{{ order.payment_status }}</td>
+              <td>{{ order.shipping_address }}</td>
+              <td>{{ order.shipping_zip_code }}</td>
+              <td>{{ order.payment_method }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-center text-muted">目前尚無訂單。</p>
+  {% endif %}
+
+</div>
+{% endblock %}

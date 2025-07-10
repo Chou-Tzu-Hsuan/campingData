@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+{% block title %}
+    <title>購物車</title>
+{% endblock %}
+{% block styles %}
+    <style>
+    td.word-wrap {
+        word-break: break-word;
+        max-width: 250px;
+    }
+    .btn-group-custom {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 20px;
+        align-items: center;
+    }
+    @media (max-width: 576px) {
+        .btn-group-custom > * {
+            flex: 1 1 100%;
+            max-width: 100%;
+        }
+    }
+    table.table-hover tbody tr:hover {
+        background-color: #f1f7ff;
+    }
+    </style>
+{% endblock %}
+{% block content %}
+
+<!-- 商品資訊 Modal -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="productModalLabel">商品資訊</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="modalProductImage" src="" alt="商品圖片" class="img-fluid rounded mb-3" style="max-height: 300px;">
+        <h5 id="modalProductName" class="mb-2"></h5>
+        <p id="modalProductPrice" class="text-primary fw-bold mb-1" style="font-size: 1.2em;"></p>
+        <p id="modalProductDescription" class="text-muted"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<body class="bg-light">
+<div class="container mt-5">
+    <h2 class="mb-4 text-left">🛒 購物車內容</h2>
+
+    {% if cart_items %}
+
+    <!-- 更新購物車表單 -->
+    <form id="update-cart-form" method="post" action="{% url 'update_cart' %}">
+        {% csrf_token %}
+        <input type="hidden" name="go_to_checkout" id="go-to-checkout" value="0" />
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover bg-white align-middle">
+                <thead class="table-primary text-center">
+                    <tr>
+                         <th style="width: 15%;">商品圖片</th>
+                        <th style="width: 30%;">商品名稱</th>
+                        <th style="width: 15%;">價格</th>
+                        <th style="width: 15%;">數量(可編輯)</th>
+                        <th style="width: 15%;">小計</th>
+                        <th style="width: 15%;">取消</th>
+                    </tr>
+                    
+                </thead>
+                <tbody>
+                    {% for product_id, item in cart_items.items %}
+                    <tr class="text-center">
+                        <td>
+                            {% if item.image %}                         
+                            <img src="{{ item.image }}" 
+                                alt="{{ item.product_name }}" 
+                                style="max-width: 80px; max-height: 80px; cursor: pointer;"
+                                class="img-fluid rounded shadow-sm mb-2"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#productModal"
+                                onclick="showProductModal('{{ item.product_name }}', '{{ item.image }}', '{{ item.price }}')">
+                            {% else %}
+                                <span class="text-muted">❌ 無圖片</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="word-wrap text-start">{{ item.product_name|default:"❌ 未知商品" }}</td>
+                        <td>
+                            {% if item.price is not None %}
+                                ${{ item.price|floatformat:0 }}
+                            {% else %}
+                                ❌ 未知價格
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <input
+                                type="number"
+                                name="quantity_{{ product_id }}"
+                                value="{{ item.quantity }}"
+                                min="1"
+                                max="10"
+                                class="form-control form-control-sm quantity-input text-center"
+                                data-price="{{ item.price }}"
+                                oninput="updateSubtotal(this)"
+                                style="max-width: 90px; margin: 0 auto;"
+                            />
+                        </td>
+
+                        <td class="subtotal-cell fw-semibold">$ {{ item.subtotal|floatformat:0 }}</td>
+                        <td>
+                            <button type="button"
+                                    onclick="removeItem('{{ product_id }}')"
+                                    class="btn btn-outline-danger btn-sm"
+                                    title="移除商品">
+                                    🔴 移除
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+        <div class="text-end mt-3 fs-5 fw-bold">
+            總金額：<span id="total-display">${{ total}}</span>
+        </div>
+    </form>
+
+    <!-- 清空購物車表單（獨立） -->
+    <form id="clear-cart-form" method="post" action="{% url 'clear_cart' %}" onsubmit="return confirm('⚠️ 確定要清空整個購物車嗎？')" style="margin:0;">
+        {% csrf_token %}
+    </form>
+
+    <!-- 四個按鈕同列 -->
+    <div class="btn-group-custom">
+        <!-- 更新購物車按鈕，按下觸發 update-cart-form -->
+        <button type="submit" form="update-cart-form" class="btn btn-secondary flex-grow-1 flex-md-grow-0" style="min-width: 140px;">
+            ✅ 更新購物車
+        </button>
+
+        <!-- 清空購物車按鈕，按下觸發 clear-cart-form -->
+        <button type="submit" form="clear-cart-form" class="btn btn-danger flex-grow-1 flex-md-grow-0" style="min-width: 140px;">
+            🗑️ 清空購物車
+        </button>
+
+        <!-- 繼續購物 -->
+        <a href="{% url 'product_list' %}" class="btn btn-outline-primary flex-grow-1 flex-md-grow-0" style="min-width: 140px;">
+            🔙 繼續購物
+        </a>
+
+        <!-- 我要結帳 -->
+         <a href="#" onclick="startCheckout()" class="btn btn-success flex-grow-1 flex-md-grow-0" style="min-width: 140px;">
+            🧾 我要結帳
+        </a>
+    </div>
+
+    {% for product_id, item in cart_items.items %}
+    <form id="remove-form-{{ product_id }}" method="post" action="{% url 'remove_from_cart' product_id %}" style="display:none;">
+        {% csrf_token %}
+    </form>
+    {% endfor %}
+
+    {% else %}
+        <p class="text-danger fs-5 text-left">目前購物車是空的。</p>
+    {% endif %}
+</div>
+{% endblock %}
+{% block script %}
+<script>
+function updateSubtotal(input) {
+    const price = parseFloat(input.dataset.price);
+    const quantity = parseInt(input.value);
+    const row = input.closest('tr');
+    const subtotalCell = row.querySelector('.subtotal-cell');
+
+    if (!isNaN(price) && !isNaN(quantity)) {
+        const subtotal = price * quantity;
+        subtotalCell.textContent = `$${subtotal.toFixed(0)}`;
+    }
+
+    updateTotal();
+}
+
+function updateTotal() {
+    let total = 0;
+    let totalQuantity = 0;
+
+    document.querySelectorAll('.quantity-input').forEach(input => {
+        const price = parseFloat(input.dataset.price);
+        const quantity = parseInt(input.value);
+        if (!isNaN(price) && !isNaN(quantity)) {
+            total += price * quantity;
+            totalQuantity += quantity;
+        }
+    });
+
+    const totalDisplay = document.getElementById('total-display');
+    if (totalDisplay) {
+        totalDisplay.textContent = `$${total.toFixed(0)}`;
+    }
+
+    // ✅ 更新 navbar 的購物車徽章
+    const cartCount = document.getElementById('cart-count');
+    if (cartCount) {
+        cartCount.textContent = totalQuantity;
+    }
+
+    // ✅ 儲存到 localStorage，讓其他頁面能同步讀到
+    localStorage.setItem('cartCount', totalQuantity);
+}
+
+function removeItem(productId) {
+    if(confirm('⚠️ 確定要移除這個商品嗎？')) {
+        const form = document.getElementById(`remove-form-${productId}`);
+        if(form) {
+            form.submit();
+        }
+    }
+}
+
+function startCheckout() {
+    document.getElementById('go-to-checkout').value = '1';
+    document.getElementById('update-cart-form').submit();
+}
+
+function showProductModal(name, imageUrl,price) {
+    document.getElementById('modalProductName').textContent = name;
+    document.getElementById('modalProductImage').src = imageUrl;
+    document.getElementById('modalProductPrice').innerText = '價格：$' + price;
+}
+
+
+// ✅ 用 AJAX 更新後端購物車數量
+function updateQuantity(productId, quantity) {
+    fetch("{% url 'update_cart_quantity' %}", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `product_id=${productId}&quantity=${quantity}`
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log('後端已更新購物車', data);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    updateTotal();  // 初始化總金額與徽章數量
+
+    // ✅ 為每個數量輸入框加上 input 事件監聽
+    document.querySelectorAll('.quantity-input').forEach(function(input) {
+        input.addEventListener('input', function () {
+            const productId = input.name.split('_')[1];  // 取得 product_id
+            const quantity = parseInt(input.value);
+
+            if (!isNaN(quantity) && quantity > 0) {
+                updateQuantity(productId, quantity);  // 同步後端
+                updateSubtotal(input);               // 更新前端小計與總額
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+

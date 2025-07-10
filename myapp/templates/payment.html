@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>轉接至金流頁面...</title>
+</head>
+<body>
+    <p>正在轉接至 ECPay 金流頁面，請稍候...</p>
+    {{ form_html|safe }}
+
+    <script>
+        document.getElementById('ecpay-form').submit();
+    </script>
+</body>
+</html>

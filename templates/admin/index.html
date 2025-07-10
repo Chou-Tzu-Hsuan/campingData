@@ -1,0 +1,19 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>管理後台首頁</h1>
+
+<!-- 🔗 自訂功能區塊 -->
+<div class="app-list">
+  <div class="app">
+    <h2>📈 銷售統計報表</h2>
+    <ul class="model-list">
+      <li><a href="{% url 'admin:sales-stats' %}">🔍 查看前 10 名商品銷售統計圖</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ✅ 繼續顯示原本的 app 模型列表 -->
+{{ block.super }}
+{% endblock %}

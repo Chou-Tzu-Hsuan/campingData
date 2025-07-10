@@ -1,0 +1,387 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block title %} {% endblock  %}
+    {# <link rel="stylesheet" href="{% static 'myapp/css/style.css' %}">#}
+    <link rel="stylesheet" href="{% static 'myapp/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'myapp/slick/slick.css' %}">
+    <link rel="stylesheet" href="{% static 'myapp/slick/slick-theme.css' %}">
+    {% block head%}{% endblock  %}
+    <style>
+        
+        /*輸播有關*/
+        .carousel-container {
+            width: 100%;
+            height: 70vh;
+            overflow: hidden;
+        }
+        /*輸播有關*/
+        .slick-slide {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            height: 70vh;
+        }
+        /*輸播圖片尺寸設定*/
+        .carousel-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f7f7f7;
+            /* 這兩行非常重要，您已經有了，很好 */
+            display: flex; /* 讓 body 成為 flex 容器 */
+            flex-direction: column; /* 讓子元素垂直排列 */
+            min-height: 100vh; /* 確保 body 至少有整個視窗的高度 */
+            /*height: 100%;*/
+        }
+
+        .header {
+            background-color: black;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .footer {
+            background-color: black;
+            text-align: center;
+            padding: 20px;
+        }
+
+        main {
+            flex-grow: 1; /* 讓 main 元素彈性地佔據所有可用空間 */
+            /* 您可以為 main 添加一些預設的 padding 或 margin */
+            padding-top: 20px; /* 範例：讓內容區塊與上方有點距離 */
+            padding-bottom: 20px; /* 範例：讓內容區塊與下方有點距離 */
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .product-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 420px;
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 15px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .product-grid > div {
+            overflow: hidden;
+        }
+
+        .product-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+
+        .product-card h3 {
+            font-size: 1.1rem;
+            margin: 10px 0 5px;
+            line-height: 1.4;
+            min-height: 3.6em;
+            overflow: hidden;
+        }
+
+        .product-card .price {
+            font-weight: bold;
+            color: #d35400;
+            min-height: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .product-card .btn-group {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .product-card .btn-group .btn,
+        .product-card .btn-group form button {
+            flex: 1 1 0;
+            min-width: 0;
+            white-space: nowrap;
+        }
+        /*@media「響應」不同的設備*/
+        @media (max-width: 991px) {
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .carousel-container,
+            .slick-slide {
+                height: 40vh;
+            }
+        }
+        @media (max-width: 768px) {
+            #categorySelect {
+                font-size: 1rem;
+                padding: 0.5rem;
+            }
+        }
+
+        a {
+            text-decoration: none !important;
+        }
+        /*點收藏時愛心縮放動畫*/
+        @keyframes pulse {
+        0%   { transform: scale(1); }
+        50%  { transform: scale(1.3); }
+        100% { transform: scale(1); }
+        }
+
+        /*點收藏時愛心縮放動畫*/
+        .animate-heart {
+        animation: pulse 0.3s ease;
+        }
+
+        /* 強化 Tab 樣式控制 */
+        .nav-tabs .nav-link {
+            color: gray !important;           /* 未選取時為灰色 */
+            font-weight: normal;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: black !important;          /* 當前選取為黑色 */
+            font-weight: bold;
+            border-color: black black transparent;  /* 選取時底線強調 */
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: black !important;          /* 滑過時變黑 */
+        }
+
+        #categorySelect {
+            border-color: black;
+            color: black;
+            font-weight: bold;
+        }
+    </style>
+    {% block styles %}{% endblock %}
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<div class="container-fluid py-2 px-4" style="background-color: black;"> 
+    <div class="row align-items-center flex-nowrap justify-content-between">
+
+        <!-- LOGO -->
+        <div class="col-auto">
+           <a href="/home/"> <img src="{% static 'myapp/images/logo6.jpg' %}" alt="python_logo" height="60px"></a>
+        </div>
+        <div class="col-auto" style="color: #f7f7f7; font-size: large;">
+            <a href="/home/" style="color: white;">Python Camping</a>
+        </div>
+
+        <!-- 導覽選單容器 -->
+        <div class="col d-flex justify-content-center">
+
+            <!-- 桌機：導覽按鈕 -->
+            <div class="d-none d-sm-flex flex-wrap justify-content-center gap-2">
+                <a href="{% url 'new_products' %}" class="btn btn-link text-white fs-6">📢 新品快訊</a>
+                <a href="{% url 'activity' %}" class="btn btn-link text-white fs-6">🏕️ 露營活動公告</a>
+                <a href="{% url 'product_list' %}" class="btn btn-link text-white fs-6">⛺ 產品資訊</a>
+                <a href="{% url 'locations' %}" class="btn btn-link text-white fs-6">📍 銷售據點</a>
+                <a href="{% url 'shoppingNotice' %}" class="btn btn-link text-white fs-6"> 🛍️購物需知</a>
+            </div>
+
+            <!-- 手機：導覽選單下拉 -->
+            <div class="dropdown d-sm-none d-flex w-100">
+                <button class="btn btn-outline-light btn-sm dropdown-toggle ms-auto" type="button" data-bs-toggle="dropdown">
+                    ☰ 選單
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-end text-center">
+                    <li><a class="dropdown-item" href="{% url 'new_products' %}">📢 新品快訊</a></li>
+                    <li><a class="dropdown-item" href="{% url 'activity' %}">🌵 露營活動公告</a></li>
+                    <li><a class="dropdown-item" href="{% url 'product_list' %}">⛺ 產品資訊</a></li>
+                    <li><a class="dropdown-item" href="{% url 'locations' %}">📍 銷售據點</a></li>
+                    <li><a class="dropdown-item" href="{% url 'shoppingNotice' %}"> 🛍️購物需知</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    {% if user.is_authenticated %}
+                        <li><a class="dropdown-item" href="{% url 'user_info' %}">🔓 {{ user.username }}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'view_cart' %}">🛒 查看購物車</a></li>
+                        <li>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button class="dropdown-item" type="submit">登出</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li><a class="dropdown-item" href="{% url 'userlogin' %}">登入</a></li>
+                        <li><a class="dropdown-item" href="{% url 'register' %}">註冊</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- 桌機版：購物車與會員功能 -->
+        <div class="col-auto d-none d-sm-flex align-items-center gap-2 text-white">
+            <a href="{% url 'view_cart' %}" class="btn btn-outline-light btn-sm position-relative d-inline-flex align-items-center">
+                <i class="bi bi-cart-fill" style="font-size: 1.2rem;"></i>
+                <span class="ms-2">查看購物車</span>
+                    
+                    {% if cart_item_count > 0 %}
+                    <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                        style="transform: translate(-50%, -50%);">
+                        {{ cart_item_count }}
+                        <span class="visually-hidden">購物車內商品數量</span>
+                    </span>
+                    {% endif %}
+            </a>
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'user_info' %}" class="text-white text-decoration-none">
+                    🔓 {{ user.username }}
+                </a>
+                <form method="post" action="{% url 'logout' %}" class="ms-2 mb-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-light btn-sm">登出</button>
+                </form>
+            {% else %}
+                <a href="{% url 'userlogin' %}" class="btn btn-outline-light btn-sm me-2">登入</a>
+                <a href="{% url 'register' %}" class="btn btn-warning btn-sm">註冊</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<main>
+{% block content %} {% endblock %}
+</main>
+<!-- 回首頁按鍵 -->
+<div class="text-center mt-4">
+    <a href="{% url 'home' %}" class="btn btn-outline-secondary">← 回首頁</a>
+</div>
+
+<footer class="footer text-white mt-5">
+    <div class="container py-4">
+        <div class="row justify-content-center text-center">
+            <div class="col-auto">
+                <a href="{% url 'returnNotice' %}" class="btn btn-link text-white fs-6">⛺ 退貨需知</a>
+            </div>
+            <div class="col-auto">
+                <a href="{% url 'locations' %}" class="btn btn-link text-white fs-6">📍 銷售據點</a>
+            </div>
+            <div class="col-auto">
+                <a href="{% url 'shoppingNotice' %}" class="btn btn-link text-white fs-6">🛍️ 購物需知</a>
+            </div>
+            <div class="col-12 mt-3">
+                <small class="text-muted">© 2025 派森露營商城. All rights reserved.</small>
+            </div>
+        </div>
+    </div>
+
+
+</footer>
+
+<!-- CSS連結區勿動 -->
+<script src="{% static 'myapp/jquery/jquery-3.7.1.min.js' %}"></script>
+<script src="{% static 'myapp/slick/slick.min.js' %}"></script>
+<script src="{% static 'myapp/js/bootstrap.bundle.min.js' %}"></script>
+<script>
+    $(document).ready(function(){
+        $('.carousel-container').slick({
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            autoplay: true,
+            autoplaySpeed: 3000,
+            arrows: true,
+            dots: true,
+            infinite: true,
+            speed: 1000
+        });
+    });
+    
+     // 手機版下拉選單切換 Tab
+    function switchTab(select) {
+        var tabId = select.value;
+
+        document.querySelectorAll('.tab-pane').forEach(function(pane) {
+            pane.classList.remove('show', 'active');
+        });
+
+        var target = document.getElementById(tabId);
+        if (target) {
+            target.classList.add('show', 'active');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var firstActive = document.querySelector('.tab-pane.show.active');
+        if (firstActive) {
+            var select = document.getElementById('categorySelect');
+            if (select) select.value = firstActive.id;
+        }
+    });
+
+</script>
+<script>
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        // Cookie 名稱開頭
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  const csrftoken = getCookie('csrftoken');
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const cartCount = document.getElementById('cart-count');
+    const savedCount = localStorage.getItem('cartCount');
+    if (cartCount && savedCount !== null) {
+        cartCount.textContent = savedCount;
+    }
+
+    // 監聽 localStorage 變化
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'cartCount' && cartCount) {
+            cartCount.textContent = e.newValue;
+        }
+    });
+});
+</script>
+
+ {% block script %}{% endblock %}
+</body>
+</html>

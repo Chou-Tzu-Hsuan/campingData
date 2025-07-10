@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  <title>派森Python-會員登入</title>
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 420px;">
+    <div class="card shadow">
+        <div class="card-body">
+            <h3 class="text-center mb-4">會員登入</h3>
+            <form method="post" action="?next={{ next|urlencode }}">
+            <!--<form method="post" action="/userlogin/">原本的不要動-->
+                {% csrf_token %}
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-warning">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="mb-3">
+                    <label for="username" class="form-label">帳號</label>
+                    <input type="text" name="username" id="username" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">密碼</label>
+                    <div class="input-group">
+                        <input type="password" name="password" id="password" class="form-control" required>
+                        <span class="input-group-text" onclick="togglePassword('password', this)" style="cursor: pointer;">
+                        <i class="fa-solid fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+            
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success">🔐 登入</button>
+                </div>
+            </form>
+
+            <div class="d-flex justify-content-between mt-3">
+                <a href="{% url 'password_reset' %}" class="text-decoration-none">🔁 忘記密碼？</a>
+                <a href="/register/" class="text-decoration-none">📝 建立帳號</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+  function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector("i");
+    if (input.type === "password") {
+      input.type = "text";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    } else {
+      input.type = "password";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
+    }
+  }
+</script>
+{% endblock  %}
