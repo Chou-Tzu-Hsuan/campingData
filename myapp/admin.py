@@ -88,7 +88,7 @@ def sales_stats_view(request):
         .order_by('-total_quantity')[:10]
     )
 
-    labels = [p.product_name for p in products]
+    labels = [p.product_name[:24] for p in products]
     quantities = [p.total_quantity for p in products]
     revenues = [p.total_revenue or 0 for p in products]
 
