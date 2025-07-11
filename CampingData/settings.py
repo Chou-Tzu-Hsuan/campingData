@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # DEBUG = True
 DEBUG = os.environ.get("DEBUG","False").lower == "true"
 #ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1 localhost").split(" ")
 
 # Application definition
 
@@ -111,7 +111,7 @@ DATABASES = {
             'charset': 'utf8mb4',}
             }}
 
-database_url = os.environ.get("DATABASE_URL")
+database_url = os.environ.get("DATABASE_URL","")
 DATABASES["default"] = dj_database_url.parse(database_url)
 #DATABASES["default"]=dj_database_url.parse("postgresql://campingdata_render_user:nA1kyLdHmR9REQmQNa4n6uItBTWc3YBP@dpg-d1oj06idbo4c73b4l8u0-a.oregon-postgres.render.com/campingdata_render") 
 
