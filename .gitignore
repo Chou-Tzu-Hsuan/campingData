@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+
+# Django media (如果你要上傳圖片就不能忽略它)
+# media/   👈 這行你暫時不要加！要保留 media 上傳！
+
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# VS Code
+.vscode/
+
+# macOS / Windows
+.DS_Store
+Thumbs.db
+
+# Static files
+staticfiles/
