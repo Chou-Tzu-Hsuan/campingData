@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}<title>產品名細</title> {% endblock  %}
+{% block style %}
+
+<style>
+  .btn-xs {
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    border-radius: 4px;
+  }
+</style>
+{% endblock%}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-l p-4 mx-auto w-100" style="font-family: Arial, sans-serif;">
+    <div class="row g-4">
+      <!-- 📷 圖片欄，圖片更大+輸播功能 -->
+      <div class="col-md-6 d-flex align-items-top justify-content-center">
+        {% if product.images.all %}
+          <div id="productCarousel" class="carousel slide w-100" data-bs-ride="carousel">
+            <div class="carousel-inner text-center">
+              {% for img in product.images.all %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <img src="{{ img.image.url }}" class="d-block w-100 img-fluid"
+                    alt="{{ img.alt_text|default:product.product_name }}"
+                    style="max-height: 400px; object-fit: contain;">
+              </div>
+              {% endfor %}
+            </div>
+            {% if product.images.count > 1 %}
+            <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">上一張</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">下一張</span>
+            </button>
+            {% endif %}
+          </div>
+        {% elif product.image %}
+          <img src="{{ product.image.url }}" alt="{{ product.product_name }}" class="img-fluid">
+        {% else %}
+          <div class="text-muted">無圖片</div>
+        {% endif %}
+      </div>
+
+      <!-- 商品資訊欄 -->
+      <div class="col-md-6 d-flex flex-column">
+        <h2 class="text-primary mb-3">{{ product.product_name }}</h2>
+        <p class="text-muted" style="line-height: 1.6;">{{ product.description }}</p>
+
+        <hr class="my-3">
+
+        <ul class="list-unstyled mb-4 fs-6">
+          <li><strong>💰 價格：</strong> {{ product.price }} 元</li>
+          <li><strong>📦 庫存：</strong> {{ product.stock_quantity }} 件</li>
+          <li><strong>🏷️ 品牌：</strong> {{ product.brand.brand_name }}</li>
+          <li><strong>🗂️ 分類：</strong> {{ product.category.category_name }}</li>
+        </ul>
+
+        <!-- 按鈕排右側，小尺寸 -->
+        <div class="mt-auto">
+          <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
+            <form action="{% url 'add_to_cart' product.pk %}" method="post" class="m-0">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-success btn-xs px-3 py-2 fw-semibold shadow-sm rounded">
+                🛒 加入購物車
+              </button>
+            </form>
+
+            <button id="wishlist-btn"
+                    data-url="{% url 'toggle_wishlist' product.pk %}"
+                    class="btn {% if is_favorited %}btn-danger{% else %}btn-outline-danger{% endif %} btn-xs px-3 py-2 fw-semibold shadow-sm rounded">
+              {% if is_favorited %}
+                ❤️ 取消收藏
+              {% else %}
+                ♡ 加入收藏
+              {% endif %}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 回商品清單 -->
+  <div class="text-center mt-4">
+    <a href="{% url 'product_list' %}" class="btn btn-primary btn-sm">
+      ← 回產品清單
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+
+
+{% block script %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const wishlistBtn = document.getElementById('wishlist-btn');
+
+  if (wishlistBtn) {
+    wishlistBtn.addEventListener('click', function (e) {
+      e.preventDefault();  // 防止預設跳轉行為
+      const url = wishlistBtn.dataset.url;
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Accept': 'application/json'
+        }
+      })
+      .then(res => {
+        if (res.status === 401) {
+          // 未登入 ➜ 導回登入頁，保留返回商品頁
+          window.location.href = `/userlogin/?next={{ request.path }}`;
+          return;
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (!data) return;
+
+        // 切換按鈕狀態
+        if (data.status === 'added') {
+          wishlistBtn.classList.remove('btn-outline-danger');
+          wishlistBtn.classList.add('btn-danger');
+          wishlistBtn.innerHTML = '❤️ 取消收藏';
+        } else if (data.status === 'removed') {
+          wishlistBtn.classList.remove('btn-danger');
+          wishlistBtn.classList.add('btn-outline-danger');
+          wishlistBtn.innerHTML = '♡ 加入收藏';
+        }
+      })
+      .catch(err => console.error('收藏操作失敗:', err));
+    });
+  }
+});
+</script>
+
+
+{% endblock %}
+

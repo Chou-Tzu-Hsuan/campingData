@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}<title>商品列表</title>{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    <!-- 搜尋與篩選表單 -->
+    <form action="{% url 'product_list' %}" method="get" class="row g-2 justify-content-end align-items-center mb-4">
+      <div class="col-md-3">
+        <select name="category" class="form-select">
+          <option value="">所有分類</option>
+          {% for category in all_categories %}
+            <option value="{{ category.category_id }}" {% if selected_category == category.category_id|stringformat:"s" %}selected{% endif %}>
+              {{ category.category_name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select name="brand" class="form-select">
+          <option value="">所有品牌</option>
+          {% for brand in all_brands %}
+            <option value="{{ brand.brand_id }}" {% if selected_brand == brand.brand_id|stringformat:"s" %}selected{% endif %}>
+              {{ brand.brand_name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4">
+        <div class="input-group">
+          <input type="search" name="q" value="{{ keyword|default_if_none:'' }}" class="form-control" placeholder="輸入關鍵字...">
+          <button type="submit" class="btn btn-primary">搜尋</button>
+        </div>
+      </div>
+    </form>
+
+    <!-- 商品列表 -->
+    <h2 class="mt-4 mb-3">商品列表</h2>
+    {% if products %}
+    <div class="row">
+      {% for product in products %}
+      {% if product.pk %}
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100 shadow">
+          <!-- 圖片區域：置中、等比例、固定高度 -->
+          <div style="height: 250px; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+            {% with product.images.first as main_image %}
+              {% if main_image %}
+                <img src="{{ main_image.image.url }}" alt="{{ main_image.alt_text }}" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+              {% elif product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.product_name }}" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+              {% else %}
+                <div class="text-muted">無圖片</div>
+              {% endif %}
+            {% endwith %}
+          </div>
+
+          <!-- 卡片內容 -->
+          <div class="card-body d-flex flex-column justify-content-between">
+            <div>
+              <h5 class="card-title">{{ product.product_name }}</h5>
+              <p class="card-text text-muted">價格：<strong>${{ product.price|floatformat:0 }}</strong></p>
+            </div>
+            <div class="d-flex justify-content-between mt-auto pt-2 gap-1 flex-wrap">
+              <a href="{% url 'product_detail' product.pk %}" class="btn btn-sm btn-outline-primary flex-fill">🔍 詳情</a>
+          
+              <form method="post" action="{% url 'add_to_cart' product.pk %}" class="m-0 flex-fill">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-success w-100">🛒 加入</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% else %}
+      <p class="text-muted">目前沒有商品。</p>
+    {% endif %}
+  </div>
+
+
+
+  <!-- 分頁 + 頁面編碼-->
+  <nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if keyword %}q={{ keyword }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link" aria-hidden="true">&laquo;</span>
+        </li>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% else %}
+          <li class="page-item">
+            <a class="page-link" href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if keyword %}q={{ keyword }}&{% endif %}page={{ num }}">{{ num }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if keyword %}q={{ keyword }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link" aria-hidden="true">&raquo;</span>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+
+
+{% endblock %}
+
+

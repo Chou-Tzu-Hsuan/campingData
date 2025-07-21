@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  <title>露營活動公告</title>
+{% endblock %}
+
+{% block style %}
+<style>
+/* 手機版優化設定 */
+@media (max-width: 768px) {
+    .activity-heading {
+        font-size: 1.3rem;
+    }
+
+    .activity-banner {
+        width: 80%;
+        margin-top: 1rem;
+    }
+
+    .main-activity-img {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center mb-4">
+        <h2 class="d-inline-block align-middle activity-heading">派森 Python 露營活動公告</h2>
+        <img src="{% static 'myapp/images/camping.png' %}" 
+             alt="LetGoCamping"
+             class="activity-banner d-inline-block align-middle"
+             style="width: 60px; max-width: 100%; margin-left: 10px; vertical-align: middle;">
+    </div>
+
+    <!-- 活動主圖 -->
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <img src="{% static 'myapp/images/2025activity.jpg' %}" 
+                 alt="露營活動圖示"
+                 class="img-fluid rounded shadow main-activity-img"
+                 style="width: 100%; max-width: 800px;">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

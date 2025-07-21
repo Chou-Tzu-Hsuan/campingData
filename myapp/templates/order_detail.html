@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>訂單明細 #{{ order.id }}</h2>
+  <p><strong>日期：</strong>{{ order.order_date }}</p>
+  <p><strong>付款狀態：</strong>{{ order.payment_status }}</p>
+  <p><strong>付款方式：</strong>{{ order.payment_method }}</p>
+  <p><strong>寄送地址：</strong>
+    {{ order.shipping_country }} {{ order.shipping_state_province }} {{ order.shipping_city }} {{ order.shipping_address }} {{ order.shipping_zip_code }}
+  </p>
+  <p><strong>電費：</strong>${{ order.electricity_fee }}</p>
+  <hr>
+  <h4>品項列表</h4>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>商品名稱</th>
+        <th>單價</th>
+        <th>數量</th>
+        <th>小計</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.product.product_name }}</td>
+        <td>${{ item.price_at_purchase }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>${{ item.price_at_purchase|floatformat:2|add:item.quantity|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <h5 class="text-end">總金額：<strong>${{ order.total_amount }}</strong></h5>
+</div>
+{% endblock %}

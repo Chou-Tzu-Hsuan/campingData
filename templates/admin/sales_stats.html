@@ -1,0 +1,13 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<p>以下是銷售前 10 名商品的統計圖：</p>
+
+{% if image_base64 %}
+  <img src="data:image/png;base64,{{ image_base64 }}" alt="Sales Chart" class="img-fluid">
+{% else %}
+  <p>❌ 沒有可顯示的圖表資料。</p>
+{% endif %}
+
+{% endblock %}

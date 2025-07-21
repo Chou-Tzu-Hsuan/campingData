@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  <title>派森Python-會員註冊</title>
+  <style>
+    .card {
+    /* ... 其他樣式 ... */
+    width: 600px; /* 設定為固定的 600 像素寬度 */
+    /* 或者 */
+    /* width: 80%; */ /* 設定為父元素寬度的 80% */
+    margin-left: auto; /* 讓區塊水平置中 */
+    margin-right: auto; /* 讓區塊水平置中 */
+    }
+    .text-center {
+    text-align: center; /* 將其內部的行內元素（包括按鈕）置中 */
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="card box-shadow-lg" style="border-radius: 10px;">
+    <div class="card-body mt-4">
+        <h2>Welcome派森Python-會員註冊</h2>
+        <form action="/register/" method="post">
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                <label for="username" >帳號<span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="請輸入使用者帳號" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="password" >密碼<span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="請輸入密碼" required
+                pattern="/[A-Z^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,12}$/" title="密碼:6~12位的英文或數字">
+            </div>
+            <div class="form-group mb-3">
+                <label for="repassword" >確認密碼<span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="repassword" name="repassword" placeholder="請再次次輸入密碼" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="email" >電子信箱<span class="text-danger">*</span></label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="請輸入電子信箱" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="phone" >手機號碼<span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="phone" name="phone" placeholder="請輸入電話號碼" >
+            </div>
+            <div class="form-group mb-3">
+                <label for="address">地址 <span class="text-danger">*</span></label>
+                <input type="text" name="address" id="address" class="form-control" placeholder="請輸入地址" required>
+            </div>
+            <div class="form-group mb-3">
+                <div class="text-center">
+                    <input type="submit" class="btn btn-primary btn-lg" value="註冊">
+                </div>
+            </div>
+            <div class="text-center mt-3">
+            已有帳號？<a href="{% url 'userlogin' %}">登入</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock content %}

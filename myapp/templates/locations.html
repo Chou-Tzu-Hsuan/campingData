@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  <title>銷售據點 - 派森Python露營用品公司</title>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">銷售據點</h2>
+
+    <div class="list-group mb-5">
+        <div class="list-group-item">
+            <h5>🏢 總公司</h5>
+            <p>地址：桃園市楊梅區幼獅路二段3號<br>電話：0800-123456</p>
+            <iframe 
+                src="https://www.google.com/maps?q=桃園市楊梅區幼獅路二段3號&output=embed" 
+                width="100%" height="300" style="border:0;" allowfullscreen loading="lazy">
+            </iframe>
+        </div>
+        <div class="list-group-item">
+            <h5>📍 北區分店</h5>
+            <p>地址：新北市新莊區中平路439號南棟3樓<br>電話：(02)899-9632</p>
+            <iframe 
+                src="https://www.google.com/maps?q=新北市新莊區中平路439號&output=embed" 
+                width="100%" height="300" style="border:0;" allowfullscreen loading="lazy">
+            </iframe>
+        </div>
+        <div class="list-group-item">
+            <h5>📦 桃園倉庫</h5>
+            <p>地址：桃園市楊梅區秀才路851號<br>電話：(03)485-7412</p>
+            <iframe 
+                src="https://www.google.com/maps?q=桃園市楊梅區秀才路851號&output=embed" 
+                width="100%" height="300" style="border:0;" allowfullscreen loading="lazy">
+            </iframe>
+        </div>
+        <div class="list-group-item">
+            <h5>🏭 中彰投分署</h5>
+            <p>地址：臺中市西屯區工業區一路100號<br>電話：(04)2359-8523</p>
+            <iframe 
+                src="https://www.google.com/maps?q=臺中市西屯區工業區一路100號&output=embed" 
+                width="100%" height="300" style="border:0;" allowfullscreen loading="lazy">
+            </iframe>
+        </div>
+        <div class="list-group-item">
+            <h5>🏭 雲嘉南分署</h5>
+            <p>地址：臺南市官田區工業路40號<br>電話：(06)698-9874</p>
+            <iframe 
+                src="https://www.google.com/maps?q=臺南市官田區工業路40號&output=embed" 
+                width="100%" height="300" style="border:0;" allowfullscreen loading="lazy">
+            </iframe>
+        </div>
+        <div class="list-group-item">
+            <h5>🏭 高屏澎東分署</h5>
+            <p>地址：高雄市前鎮區凱旋四路105號<br>電話：(07)821-2587</p>
+            <iframe 
+                src="https://www.google.com/maps?q=高雄市前鎮區凱旋四路105號&output=embed" 
+                width="100%" height="300" style="border:0;" allowfullscreen loading="lazy">
+            </iframe>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

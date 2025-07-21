@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  <title>派森Python-退貨需知</title>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="text-center mb-4">
+    <h2 class="fw-bold">退貨須知</h2>
+   
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8">
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title text-center mb-3">親愛的顧客您好，請詳閱以下退貨政策：</h5>
+          <ul class="list-group list-group-flush text-start">
+            <li class="list-group-item">
+              依《消費者保護法》規定，消費者享有商品簽收翌日起算
+              <strong>七日猶豫期（含例假日）</strong>。
+              此期間內因品質或瑕疵問題申請退/換貨，<u>無須負擔運費</u>。
+              請於猶豫期內提出，<mark>逾期恕不受理</mark>。
+            </li>
+            <li class="list-group-item">
+              猶豫期並非試用期。退回商品必須為
+              <strong>全新狀態</strong>，包含商品本體、配件、贈品、保證書、原廠包裝及相關文件，
+              <u>不可直接在原包裝上貼運送資訊</u>。
+            </li>
+            <li class="list-group-item">
+              請勿拆解或損毀原廠外盒。若有拆封、毀損或缺件，我們將酌收產品訂價
+              <strong>15% 的整新費</strong>。如因人為使用不當造成毀損，<span class="text-danger">恕不退費</span>。
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
