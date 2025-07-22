@@ -55,6 +55,7 @@ LOGIN_URL = '/userlogin/'
 
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',  #whitenoise
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -62,8 +63,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-     'whitenoise.middleware.WhiteNoiseMiddleware',  #whitenoise
-    
 ]
 
 ROOT_URLCONF = 'CampingData.urls'
@@ -195,17 +194,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 # 本機
-# STATIC_URL = 'static/'
-# STATICFILES_DIRS = [
-#     BASE_DIR / 'static',
-# ]
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
 # #....render使用STATIC_ROOT....
-# STATIC_ROOT = BASE_DIR / 'staticfiles' 
-
+STATIC_ROOT = BASE_DIR / 'staticfiles' 
 
 # whitenoise........
-STATIC_ROOT = BASE_DIR/'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
