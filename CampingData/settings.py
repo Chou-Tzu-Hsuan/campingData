@@ -131,14 +131,15 @@ DATABASES = {
 #---------產品圖片指定路徑-使用cloudinary media暫時取消--------
 
 
-
+#---------cloudinary setting---------
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv('CLOUD_NAME'),
     'API_KEY': os.getenv('API_KEY'),
     'API_SECRET': os.getenv('API_SECRET'),
-}  #cloudinary setting
+}  
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'   #cloudinary setting
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+#---------cloudinary setting---------
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -181,6 +182,8 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
+#....render使用STATIC_ROOT....
+STATIC_ROOT = BASE_DIR / 'staticfiles' 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
