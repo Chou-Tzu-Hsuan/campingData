@@ -13,7 +13,7 @@ import dj_database_url
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv() # 讀取 .env（本地用，Render 上沒用）
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,10 +28,10 @@ SECRET_KEY = os.environ.get("SECRET_KEY")   #render setting
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = True  #original setting
-DEBUG = os.environ.get("DEBUG","False").lower == "true"   #render setting
+DEBUG = os.environ.get("DEBUG","False").lower() == "true"   #render setting
 
 #ALLOWED_HOSTS = ['*']  #original setting
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")  #render setting
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS","*").split(" ")  #render setting
 
 # Application definition
 
@@ -121,9 +121,25 @@ AUTH_USER_MODEL = 'myapp.User'
 #     )
 # }
 # -------------------------------------------------------------
+
+# ✅ Database 設定：自動防範 bytes 問題
+raw_db_url = os.environ.get("DATABASE_URL", None)
+
+if isinstance(raw_db_url, bytes):
+    raw_db_url = raw_db_url.decode("utf-8")
+
+if not raw_db_url:
+    raise Exception("❌ DATABASE_URL is not set! Please set it in your environment variables.")
+
+
 DATABASES = {
-    'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
+    "default": dj_database_url.parse(raw_db_url)
 }
+
+#沒有出現bytes 問題可以用下方的方式
+# DATABASES = {
+#     'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
+# }
 
 #---------產品圖片指定路徑---------
 # MEDIA_URL = '/media/'
