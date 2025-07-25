@@ -90,7 +90,7 @@ class ProductListView(ListView):
         if keyword:
             queryset = queryset.filter(product_name__icontains=keyword)
 
-        return queryset
+        return queryset.order_by('product_name')
 
     # 加入額外變數提供給模板使用（例如：分類清單、品牌清單等）
     def get_context_data(self, **kwargs):
