@@ -17,8 +17,7 @@
                     {% with product.images.first as main_image %}
                         {% if main_image %}
                             <img src="{{ main_image.image.url }}" alt="{{ main_image.alt_text }}" style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                        {% elif product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.product_name }}" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                        
                         {% else %}
                             <div class="text-muted">無圖片</div>
                         {% endif %}

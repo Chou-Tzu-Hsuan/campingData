@@ -23,14 +23,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = 'django-insecure-!+&$l&yrg)aeki!5k!yms9zbvd!7$6&o!st-fzonl7!z2u*l^%'   #original setting
+# SECRET_KEY = 'django-insecure-!+&$l&yrg)aeki!5k!yms9zbvd!7$6&o!st-fzonl7!z2u*l^%'   #original setting(1/3)
 SECRET_KEY = os.environ.get("SECRET_KEY")   #render setting
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = True  #original setting
+# DEBUG = True  #original setting(2/3)
 DEBUG = os.environ.get("DEBUG","False").lower() == "true"   #render setting
 
-#ALLOWED_HOSTS = ['*']  #original setting
+# ALLOWED_HOSTS = ['*']  #original setting(3/3)
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS","*").split(" ")  #render setting
 
 # Application definition
@@ -122,7 +122,7 @@ AUTH_USER_MODEL = 'myapp.User'
 # }
 # -------------------------------------------------------------
 
-# ✅ Database 設定：自動防範 bytes 問題
+# Database 設定：自動防範 bytes 問題
 raw_db_url = os.environ.get("DATABASE_URL", None)
 
 if isinstance(raw_db_url, bytes):

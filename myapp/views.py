@@ -54,7 +54,7 @@ def home(request):
 
 
 def new_products(request):
-    recent_days = 30  # 可調整為 7、14、30 天
+    recent_days = 90  # 可調整為 7、14、30 天
     new_products = Product.objects.filter(
         created_at__gte=timezone.now() - timedelta(days=recent_days)
     ).order_by('-created_at')

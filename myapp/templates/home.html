@@ -58,8 +58,7 @@
                         {% with product.images.first as main_image %}
                             {% if main_image %}
                                 <img src="{{ main_image.image.url }}" alt="{{ main_image.alt_text }}">
-                            {% elif product.image %}
-                                <img src="{{ product.image.url }}" alt="{{ product.product_name }}">
+                            
                             {% else %}
                                 <div class="no-image">無圖片</div>
                             {% endif %}
